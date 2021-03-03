@@ -387,7 +387,7 @@ EDGE find_edge(cur_node)
     {
       p = intersection(cur_node->coefficients,cur_ancestor->coefficients);
       
-      if ( p.x != HUGE && p.y != HUGE 
+      if ( p.x != HUGE_VAL && p.y != HUGE_VAL 
 	  && onedge(p,cur_ancestor->edge)
 	  && correct_side(p,cur_node))
 	{
@@ -612,7 +612,7 @@ erase_hyperplane(psfile,cur_node,count)
 /*			hyperplanes.					*/
 /* Parameters :	c1,c2 : two coefficient arrays, each of length 3.	*/
 /* Returns :	the intersection point, stored in an "endpoint" struct.	*/
-/*		(HUGE,HUGE) if there is no intersection.		*/
+/*		(HUGE_VAL,HUGE_VAL) if there is no intersection.		*/
 /* Calls modules :	None.						*/
 /* Is called by modules :	find_edge				*/
 /************************************************************************/
@@ -624,7 +624,7 @@ struct endpoint intersection(c1,c2)
     
   denom = c2[2] * c1[1] - c2[1] * c1[2];
   if (!denom)
-    { p.x = HUGE; p.y = HUGE; return(p);}
+    { p.x = HUGE_VAL; p.y = HUGE_VAL; return(p);}
   
   p.x = (c2[3] * c1[2] - c2[2] * c1[3]) / denom;
   p.y = (c2[1] * c1[3] - c2[3] * c1[1]) / denom;

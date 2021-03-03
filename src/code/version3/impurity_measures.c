@@ -123,7 +123,7 @@ float variance()
   float lavg=0,ravg=0,lerror = 0,rerror = 0;
   int i,lsum1=0,rsum1=0,lsum2=0,rsum2=0;
   int *temp1=NULL,*temp2=NULL;
-  static int var_compare();
+  int var_compare();
 
   if (no_of_categories > 2)
     /* Renumber categories in descending order of their proportion of
@@ -181,7 +181,7 @@ float variance()
 /*                 Variance.                                            */
 /*                 See the man page for qsort for more details.         */
 /************************************************************************/
-static int var_compare(p1,p2)
+int var_compare(p1,p2)
 int *p1,*p2;
 {
  int p;
@@ -249,7 +249,7 @@ float info_gain()
     {
       for (i=1;i<=no_of_categories;i++)
 	if (left_count[i] + right_count[i] == total_count) return(0);
-      return(HUGE);
+      return(HUGE_VAL);
     }
   else return(1.0/infogain);
 }
@@ -337,7 +337,7 @@ float twoing()
   
   twoing_val = total_left_count * total_right_count * goodness * goodness / 4;
   
-  if (twoing_val == 0) return(HUGE);
+  if (twoing_val == 0) return(HUGE_VAL);
   else return(1.0/twoing_val);
 } 
 

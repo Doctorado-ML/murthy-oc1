@@ -955,7 +955,7 @@ float oblique_split(cur_points,cur_no_of_points,cur_label)
 	      
 	      if (order_of_perturbation == BEST_FIRST)
 		{
-		  best_cur_error = HUGE;
+		  best_cur_error = HUGE_VAL;
 		  best_coeff_to_improve = 1;
 		  old_nsp = no_of_stagnant_perturbations;
 		}

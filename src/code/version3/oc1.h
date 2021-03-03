@@ -48,7 +48,7 @@
 #define MORE_THAN 		1
 
 #define MAX_COEFFICIENT 	1.0
-#define MAX_NO_OF_ATTRIBUTES	100
+#define MAX_NO_OF_ATTRIBUTES	300
 #define MAX_DT_DEPTH 		50 
 #define MAX_NO_OF_STAGNANT_PERTURBATIONS 	10
 #define MAX_CART_CYCLES         100
@@ -62,7 +62,7 @@
 #define	TEST			2
 
 #define LINESIZE 		80
-#define MISSING_VALUE           -1.0 * HUGE
+#define MISSING_VALUE           -1.0 * HUGE_VAL
 
 #define translatex(x) ((x - xmin) * (pmaxx - pminx) / (xmax - xmin) + pminx)
 #define translatey(y) ((y - ymin) * (pmaxy - pminy) / (ymax - ymin) + pminy)

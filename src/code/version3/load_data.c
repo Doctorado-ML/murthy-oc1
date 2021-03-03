@@ -100,7 +100,7 @@ int load_points(infile,points_ptr)
 	  the subsequent lines. The last entry of any line is taken as the
 	  category value, unless unlabeled is TRUE. */
 	{
-	  float temp = HUGE;
+	  float temp = HUGE_VAL;
 	  int dim=0;
 	  
 	  while (TRUE)
@@ -108,7 +108,7 @@ int load_points(infile,points_ptr)
 	      c = (char)getc(infile);
 	      if (c == '\n')
 		{
-		  if (temp != HUGE)
+		  if (temp != HUGE_VAL)
 		    { 
 		      if (unlabeled == TRUE)
 			array_name[1]->dimension[++dim] = temp;
@@ -147,7 +147,7 @@ int load_points(infile,points_ptr)
 	      if (c == ',' || isspace(c)) continue;
 	      if (isalpha(c)) 
 		error("Load_Points: Alphabetic character in datafile.");
-	      if (temp != HUGE)
+	      if (temp != HUGE_VAL)
 		{
 		  if (++dim > no_of_dimensions)
 		    {

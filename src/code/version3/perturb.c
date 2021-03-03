@@ -176,7 +176,7 @@ float cart_perturb_constant(cur_points,cur_no_of_points,cur_error)
 /*			"cur_coeff". This value is at least as good	*/
 /*			as the existing value, in terms of the global	*/
 /*			impurity measure. If no such value can be found,*/
-/*			HUGE is returned. 				*/
+/*			HUGE_VAL is returned. 				*/
 /* Parameters :	cur_points : array of pointers to the points under	*/
 /*			     consideration.				*/
 /*		cur_no_of_points : count of the points in consideration.*/
@@ -184,7 +184,7 @@ float cart_perturb_constant(cur_points,cur_no_of_points,cur_error)
 /*		cur_error_ptr : Pointer to the impurity of the current	*/
 /*				hyperplane.				*/
 /* Returns :	New value for the coefficient "cur_coeff".		*/
-/*		HUGE : if no better value than the existing one can be	*/
+/*		HUGE_VAL : if no better value than the existing one can be	*/
 /*		found.							*/
 /* Calls modules :	find_values					*/
 /*			linear_split					*/

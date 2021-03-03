@@ -1,0 +1,7 @@
+*.o
+*.dt
+*.unpruned
+*.csv
+mktree
+display
+gendata
