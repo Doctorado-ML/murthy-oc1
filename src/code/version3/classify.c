@@ -24,6 +24,7 @@ extern int no_of_dimensions,no_of_categories;
 extern int verbose;
 extern FILE *logfile;
 extern char misclassified_data[LINESIZE];
+void print_point(FILE*,POINT*,int);
   
 
 /************************************************************************/
@@ -106,7 +107,7 @@ classify (points,no_of_points,root,output)
 /* Is called by modules : 	classify				*/
 /*				main (gendata.c)			*/
 /************************************************************************/
-print_point(out,cur_point,unlabeled)
+void print_point(out,cur_point,unlabeled)
      FILE *out;
      POINT *cur_point;
      int unlabeled;

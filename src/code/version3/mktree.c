@@ -38,6 +38,7 @@ char *pname;
 char dt_file[LINESIZE],animation_file[LINESIZE],train_data[LINESIZE];
 char test_data[LINESIZE],misclassified_data[LINESIZE];
 char log_file[LINESIZE];
+void write_hyperplane(FILE*,char*);
 
 int no_of_dimensions=0,no_of_coeffs,no_of_categories=0;
 int no_of_restarts=20,no_of_folds=0;
@@ -1183,7 +1184,7 @@ float axis_parallel_split(cur_points,cur_no_of_points)
 /* Remarks : As with all other memory deallocation calls in OC1, the    */
 /*           ones in this module may also have problems.                */
 /************************************************************************/
-write_hyperplane(out,label)
+void write_hyperplane(out,label)
      FILE *out;
      char *label;
 {

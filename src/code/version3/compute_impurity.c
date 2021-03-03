@@ -25,6 +25,8 @@ extern int no_of_categories;
 extern int coeff_modified;
 extern float *coeff_array;
 
+void find_values(POINT **,int);
+
 /************************************************************************/
 /* Module name : compute_impurity					*/
 /* Functionality : Front end to the routine to compute the		*/
@@ -222,7 +224,7 @@ int stop_splitting()
 /* Remarks :	A lot of the computation done in OC1 takes place in this*/
 /*		routine, and the qsort system call in "linear_split".	*/	
 /************************************************************************/
-find_values(cur_points,cur_no_of_points)
+void find_values(cur_points,cur_no_of_points)
      POINT **cur_points;
      int cur_no_of_points;
 {

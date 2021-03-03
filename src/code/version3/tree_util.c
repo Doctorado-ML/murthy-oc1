@@ -30,6 +30,11 @@
 
 #include "oc1.h"
 
+void read_subtree(struct tree_node *, FILE*);
+void write_subtree(struct tree_node *,FILE *);
+void write_hp(struct tree_node *,FILE *);
+void write_header(FILE *);
+
 extern int no_of_dimensions, no_of_categories;
 
 struct tree_node *extra_node;
@@ -98,7 +103,7 @@ struct tree_node *read_tree(decision_tree)
 /*	hyperplane before it is needed. Such hyperplanes, that are read	*/
 /*	before they are needed, are stored in extra_node.		*/
 /************************************************************************/
-read_subtree(root,dtree)
+void read_subtree(root,dtree)
      struct tree_node *root;
      FILE *dtree;
 {
@@ -376,7 +381,7 @@ write_tree(root,dt_file)
 /* Is called by modules :	write_subtree				*/
 /*				write_tree				*/
 /************************************************************************/
-write_subtree(cur_node,dtree)
+void write_subtree(cur_node,dtree)
      struct tree_node *cur_node;
      FILE *dtree;
 {
@@ -402,7 +407,7 @@ write_subtree(cur_node,dtree)
 /*				routines (in classify_util.c) about the	*/
 /*				structure of the DT.			*/
 /************************************************************************/
-write_hp(cur_node,dtree)
+void write_hp(cur_node,dtree)
      struct tree_node *cur_node;
      FILE *dtree;
 {
@@ -440,7 +445,7 @@ write_hp(cur_node,dtree)
 /* Parameters :	dtree : file pointer to the output file.		*/
 /* Is called by modules :	write_tree				*/
 /************************************************************************/
-write_header(dtree)
+void write_header(dtree)
      FILE *dtree;
 {
   extern int no_of_dimensions,no_of_categories;

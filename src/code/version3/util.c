@@ -30,7 +30,9 @@
 /*                      routines used by most of the modules    */
 /*                      in the package.	                        */
 /****************************************************************/		
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 /************************************************************************/
 /* Module name : MyAbs                                                  */

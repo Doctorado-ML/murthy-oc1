@@ -30,6 +30,9 @@
 
 extern int no_of_coeffs,no_of_categories;
 extern int verbose;
+void compute_alpha(struct tree_node*);
+void cut_subtrees(struct tree_node*,float);
+void deallocate_tree(struct tree_node*);
 
 float *alpha_array;
 int alpha_index=0;
@@ -240,7 +243,7 @@ struct tree_node *cut_weakest_links(dtree)
 /* Is called by modules : 	cut_weakest_links			*/
 /*				compute_alpha				*/
 /************************************************************************/
-compute_alpha(node)
+void compute_alpha(node)
      struct tree_node *node;
 {
   int leaf_count();
@@ -391,7 +394,7 @@ struct tree_node *replicate_tree(root)
 /*				cut_weakest_links			*/
 /* Remarks : 	The root of a decision tree is never cut.		*/
 /************************************************************************/
-cut_subtrees(cur_node,alpha_threshold)
+void cut_subtrees(cur_node,alpha_threshold)
      struct tree_node *cur_node;
      float alpha_threshold;
 {
@@ -428,7 +431,7 @@ cut_subtrees(cur_node,alpha_threshold)
 /*				cut_subtrees				*/
 /*				deallocate_tree				*/
 /************************************************************************/
-deallocate_tree(root)
+void deallocate_tree(root)
      struct tree_node *root;
 {
   if (root == NULL) return;

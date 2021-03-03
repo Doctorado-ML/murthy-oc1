@@ -123,7 +123,7 @@ float variance()
   float lavg=0,ravg=0,lerror = 0,rerror = 0;
   int i,lsum1=0,rsum1=0,lsum2=0,rsum2=0;
   int *temp1=NULL,*temp2=NULL;
-  static int var_compare();
+  int var_compare();
 
   if (no_of_categories > 2)
     /* Renumber categories in descending order of their proportion of
@@ -181,7 +181,7 @@ float variance()
 /*                 Variance.                                            */
 /*                 See the man page for qsort for more details.         */
 /************************************************************************/
-static int var_compare(p1,p2)
+int var_compare(p1,p2)
 int *p1,*p2;
 {
  int p;

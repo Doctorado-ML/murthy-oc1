@@ -1,4 +1,5 @@
-CFLAGS  = -O1
+C	= /usr/bin/gcc
+CFLAGS  = -O0 -std=gnu89
 LIBS    = -lm
 
 SRC     = util.c tree_util.c load_data.c perturb.c \
@@ -10,15 +11,15 @@ MAKEFILE= makefile
 
 
 .c.o: $(INC) $(MAKEFILE)
-	cc $(CFLAGS) -c $*.c
+	$(C) $(CFLAGS) -c $*.c
 
 mktree: $(MAKEFILE) $(OBJ) mktree.c 
-	cc $(CFLAGS) $(OBJ) mktree.c -o mktree $(LIBS)
+	$(C) $(CFLAGS) $(OBJ) mktree.c -o mktree $(LIBS)
 
 gendata: $(MAKEFILE) util.o tree_util.o load_data.o classify.o gendata.c 
-	cc $(CFLAGS) util.o tree_util.o load_data.o classify.o gendata.c -o gendata $(LIBS)
+	$(C) $(CFLAGS) util.o tree_util.o load_data.o classify.o gendata.c -o gendata $(LIBS)
 
 display: $(MAKEFILE) util.o load_data.o display.c 
-	cc $(CFLAGS) util.o load_data.o display.c -o display $(LIBS)
+	$(C) $(CFLAGS) util.o load_data.o display.c -o display $(LIBS)
 
 $(OBJ): $(INC) $(MAKEFILE)

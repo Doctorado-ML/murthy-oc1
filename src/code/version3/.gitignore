@@ -1,0 +1,5 @@
+*.o
+*.dt
+mktree
+gendata
+display
