@@ -1,5 +1,5 @@
 C       = /usr/bin/gcc
-CFLAGS  = -O0 -std=c99
+CFLAGS  = -O0 -std=c99 -w
 LIBS    = -lm
 
 SRC     = util.c tree_util.c load_data.c perturb.c \
