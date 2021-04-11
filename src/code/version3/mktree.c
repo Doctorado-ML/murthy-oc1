@@ -101,7 +101,9 @@ char *argv[];
 {
   extern char *optarg;
   extern int optind;
-  int c1, leaf_count(), node_count(), tree_depth();
+  int c1, tree_depth();
+  int leaf_count(struct tree_node *);
+  int node_count(struct tree_node *);
   int i, j, no_of_correctly_classified_test_points;
   struct tree_node *root = NULL, *build_tree(), *read_tree();
   struct test_outcome result;
@@ -1328,6 +1330,7 @@ POINT **points;
     results[no_of_folds] = estimate_accuracy(test_points, no_of_test_points, root);
     end = clock();
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    results[no_of_folds].leaf_count = leaves_count(root);
     printf("fold %d: acc. = %.2f\t#leaves=%.0f\t#nodes=%.0f\tmax. depth=%.0f\n",
            no_of_folds, results[no_of_folds].accuracy,
            results[no_of_folds].leaf_count,

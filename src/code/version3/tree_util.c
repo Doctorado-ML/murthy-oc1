@@ -29,7 +29,9 @@
 /****************************************************************/
 
 #include "oc1.h"
-
+int leaf_count(struct tree_node *);
+int node_count(struct tree_node *);
+int leaves_count(struct tree_node *);
 extern int no_of_dimensions, no_of_categories;
 
 struct tree_node *extra_node;
@@ -304,14 +306,20 @@ int read_header(dtree)
 /* Is called by modules :       estimate_accuracy (classify.c)		*/
 /*				main (display.c)			*/
 /************************************************************************/
-int leaf_count(cur_node) struct tree_node *cur_node;
+int leaf_count(struct tree_node *cur_node)
 {
-  int leaf_count();
-
   if (cur_node == NULL)
-    return (1);
-  else
-    return (leaf_count(cur_node->left) + leaf_count(cur_node->right));
+    return 1;
+  return leaf_count(cur_node->left) + leaf_count(cur_node->right);
+}
+
+int leaves_count(struct tree_node *cur_node)
+{
+  if (cur_node == NULL)
+    return 0;
+  if (cur_node->left == NULL && cur_node->right == NULL)
+    return 1;
+  return leaves_count(cur_node->left) + leaves_count(cur_node->right);
 }
 
 /************************************************************************/
@@ -324,14 +332,11 @@ int leaf_count(cur_node) struct tree_node *cur_node;
 /* Is called by modules :       estimate_accuracy (classify.c)		*/
 /*				main (display.c)			*/
 /************************************************************************/
-int node_count(cur_node) struct tree_node *cur_node;
+int node_count(struct tree_node *cur_node)
 {
-  int node_count();
-
   if (cur_node == NULL)
-    return (1);
-  else
-    return (1 + node_count(cur_node->left) + node_count(cur_node->right));
+    return 0;
+  return 1 + node_count(cur_node->left) + node_count(cur_node->right);
 }
 
 /************************************************************************/
