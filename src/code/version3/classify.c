@@ -216,6 +216,7 @@ struct test_outcome estimate_accuracy(points,no_of_points,root)
     }
   
   result.leaf_count = leaf_count(root);
+  result.node_count = node_count(root);
   result.tree_depth = tree_depth(root);
   result.class = ivector(1, 2*no_of_categories);
   

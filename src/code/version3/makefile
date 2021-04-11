@@ -1,5 +1,5 @@
 C	= /usr/bin/gcc
-CFLAGS  = -O0 -std=gnu89
+CFLAGS  = -O0 -std=gnu89 -Wno-implicit-function-declaration -Wno-return-type
 LIBS    = -lm
 
 SRC     = util.c tree_util.c load_data.c perturb.c \
