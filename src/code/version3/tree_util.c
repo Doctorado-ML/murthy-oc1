@@ -21,12 +21,12 @@
 /*			leaf_count				*/
 /*			tree_depth				*/
 /* Uses modules in :	oc1.h					*/
-/*			util.c					*/ 
+/*			util.c					*/
 /* Is used by modules in :	mktree.c			*/
 /* Remarks       : 	These routines are mainly used to read	*/
 /*			a decision tree from a file, and to     */
 /*                      write a tree to a file.			*/
-/****************************************************************/		
+/****************************************************************/
 
 #include "oc1.h"
 
@@ -36,7 +36,7 @@ struct tree_node *extra_node;
 char train_data[LINESIZE];
 
 /************************************************************************/
-/* Module name :	read_tree					*/ 
+/* Module name :	read_tree					*/
 /* Functionality : High level routine for reading in a decision tree	*/
 /* Parameters :	decision_tree : Name of the file in which the tree is	*/
 /*		stored.							*/
@@ -50,35 +50,33 @@ char train_data[LINESIZE];
 /* Remarks : 	It is assumed that the file "decision_tree" is		*/
 /* 		written in a format similar to the output of the	*/
 /*		write_tree module. A sample decision tree is given in   */
-/*              the file sample.dt.				        */ 
+/*              the file sample.dt.				        */
 /************************************************************************/
-struct tree_node *read_tree(decision_tree)
-     char *decision_tree;
+struct tree_node *read_tree(decision_tree) char *decision_tree;
 {
   FILE *dtree;
-  struct tree_node *root,*cur_node,*read_hp();
+  struct tree_node *root, *cur_node, *read_hp();
   int read_header();
-  
-  if ((dtree = fopen(decision_tree,"r")) == NULL)
-    error ("Decision Tree file can not be opened.");
-  
-  if ( !(read_header(dtree))) 
+
+  if ((dtree = fopen(decision_tree, "r")) == NULL)
+    error("Decision Tree file can not be opened.");
+
+  if (!(read_header(dtree)))
     error("Decision tree invalid/absent.");
-  
+
   if ((root = read_hp(dtree)) == NULL)
     error("Decision tree invalid/absent.");
-  
+
   root->parent = NULL;
   extra_node = NULL;
-  read_subtree(root,dtree);
-  
+  read_subtree(root, dtree);
+
   fclose(dtree);
-  return(root);
+  return (root);
 }
 
-
 /************************************************************************/
-/* Module name :	read_subtree					*/ 
+/* Module name :	read_subtree					*/
 /* Functionality :	recursively reads in the hyperplane, left 	*/
 /*			subtree and the right subtree at a node of 	*/
 /*			the decision tree. 				*/
@@ -98,44 +96,47 @@ struct tree_node *read_tree(decision_tree)
 /*	hyperplane before it is needed. Such hyperplanes, that are read	*/
 /*	before they are needed, are stored in extra_node.		*/
 /************************************************************************/
-read_subtree(root,dtree)
-     struct tree_node *root;
-     FILE *dtree;
+read_subtree(root, dtree) struct tree_node *root;
+FILE *dtree;
 {
-  struct tree_node *cur_node,*read_hp();
-  int isleftchild(),isrightchild();
-  
+  struct tree_node *cur_node, *read_hp();
+  int isleftchild(), isrightchild();
+
   if (extra_node != NULL)
+  {
+    cur_node = extra_node;
+    extra_node = NULL;
+  }
+  else
+    cur_node = read_hp(dtree);
+
+  if (cur_node == NULL)
+    return;
+  if (isleftchild(cur_node, root))
+  {
+    cur_node->parent = root;
+    root->left = cur_node;
+
+    read_subtree(cur_node, dtree);
+    if (extra_node != NULL)
     {
       cur_node = extra_node;
       extra_node = NULL;
     }
-  else cur_node = read_hp(dtree);
-  
-  if (cur_node == NULL) return;
-  if (isleftchild(cur_node,root))
-    {
-      cur_node->parent = root;
-      root->left = cur_node;
-      
-      read_subtree(cur_node,dtree);
-      if (extra_node != NULL)
-	{
-	  cur_node = extra_node;
-	  extra_node = NULL;
-	}
-      else
-	cur_node = read_hp(dtree);
-      if (cur_node == NULL) return;
-    }
+    else
+      cur_node = read_hp(dtree);
+    if (cur_node == NULL)
+      return;
+  }
 
-  if (isrightchild(cur_node,root))
-    {
-      cur_node->parent = root;
-      root->right = cur_node;
-      read_subtree(cur_node,dtree);
-    }
-  else extra_node = cur_node;
+  if (isrightchild(cur_node, root))
+  {
+    cur_node->parent = root;
+    root->right = cur_node;
+    read_subtree(cur_node, dtree);
+  }
+  else
+    extra_node = cur_node;
 }
 
 /************************************************************************/
@@ -153,7 +154,7 @@ read_subtree(root,dtree)
 /*		your decision tree files are not produced by "mktree".	*/
 /************************************************************************/
 struct tree_node *read_hp(dtree)
-     FILE *dtree;
+    FILE *dtree;
 {
   struct tree_node *cur_node;
   float temp;
@@ -161,67 +162,70 @@ struct tree_node *read_hp(dtree)
   int i;
 
   cur_node = (struct tree_node *)malloc(sizeof(struct tree_node));
-  cur_node->coefficients = vector(1,no_of_dimensions+1);
-  cur_node->left_count = ivector(1,no_of_categories);
-  cur_node->right_count = ivector(1,no_of_categories);
-  
-  for (i=1;i<=no_of_dimensions+1;i++) cur_node->coefficients[i] = 0;
-  
+  cur_node->coefficients = vector(1, no_of_dimensions + 1);
+  cur_node->left_count = ivector(1, no_of_categories);
+  cur_node->right_count = ivector(1, no_of_categories);
+
+  for (i = 1; i <= no_of_dimensions + 1; i++)
+    cur_node->coefficients[i] = 0;
+
   cur_node->left = cur_node->right = NULL;
-  
-  while (isspace(c = getc(dtree)));
-  ungetc(c,dtree); 
-  
-  if (fscanf(dtree,"%[^' '] Hyperplane: Left = [", cur_node->label) != 1)
-    return(NULL);
 
-  for (i=1;i<no_of_categories;i++)
-    if (fscanf(dtree,"%d,",&cur_node->left_count[i]) != 1)
-      return(NULL); 
-  if (fscanf(dtree,"%d], Right = [",
-	     &cur_node->left_count[no_of_categories]) != 1)
-    return(NULL); 
-  for (i=1;i<no_of_categories;i++)
-    if (fscanf(dtree,"%d,",&cur_node->right_count[i]) != 1)
-      return(NULL); 
-  if (fscanf(dtree,"%d]\n", &cur_node->right_count[no_of_categories]) != 1)
-    return(NULL); 
+  while (isspace(c = getc(dtree)))
+    ;
+  ungetc(c, dtree);
 
-  if (!strcmp(cur_node->label,"Root")) strcpy(cur_node->label,"");
-  
+  if (fscanf(dtree, "%[^' '] Hyperplane: Left = [", cur_node->label) != 1)
+    return (NULL);
+
+  for (i = 1; i < no_of_categories; i++)
+    if (fscanf(dtree, "%d,", &cur_node->left_count[i]) != 1)
+      return (NULL);
+  if (fscanf(dtree, "%d], Right = [",
+             &cur_node->left_count[no_of_categories]) != 1)
+    return (NULL);
+  for (i = 1; i < no_of_categories; i++)
+    if (fscanf(dtree, "%d,", &cur_node->right_count[i]) != 1)
+      return (NULL);
+  if (fscanf(dtree, "%d]\n", &cur_node->right_count[no_of_categories]) != 1)
+    return (NULL);
+
+  if (!strcmp(cur_node->label, "Root"))
+    strcpy(cur_node->label, "");
+
   while (TRUE)
+  {
+    if ((fscanf(dtree, "%f %c", &temp, &c)) != 2)
+      error("Invalid/Absent hyperplane equation.");
+    if (c == 'x')
     {
-      if ((fscanf(dtree,"%f %c",&temp,&c)) != 2)
-	error("Invalid/Absent hyperplane equation.");
-      if (c == 'x')
-	{ 
-	  if ((fscanf(dtree,"[%d] +",&i)) != 1) 
-	    error("Read-Hp: Invalid hyperplane equation.");
-	  if (i <= 0 || i > no_of_dimensions+1) 
-	    error("Read_Hp: Invalid coefficient index in decision tree.");
-	  cur_node->coefficients[i] = temp;
-	}
-      else if (c == '=')
-	{
-	  fscanf(dtree," 0\n\n");
-	  cur_node->coefficients[no_of_dimensions+1] = temp;
-	  break;
-	}
+      if ((fscanf(dtree, "[%d] +", &i)) != 1)
+        error("Read-Hp: Invalid hyperplane equation.");
+      if (i <= 0 || i > no_of_dimensions + 1)
+        error("Read_Hp: Invalid coefficient index in decision tree.");
+      cur_node->coefficients[i] = temp;
     }
+    else if (c == '=')
+    {
+      fscanf(dtree, " 0\n\n");
+      cur_node->coefficients[no_of_dimensions + 1] = temp;
+      break;
+    }
+  }
 
   cur_node->no_of_points = 0;
   cur_node->left_cat = cur_node->right_cat = 1;
-  for (i=1;i<=no_of_categories;i++)
-    {
-      cur_node->no_of_points += cur_node->left_count[i] + 
-	cur_node->right_count[i];
-      if (cur_node->left_count[i] > cur_node->left_count[cur_node->left_cat])
-	cur_node->left_cat = i;
-      if (cur_node->right_count[i] > cur_node->right_count[cur_node->right_cat])
-	cur_node->right_cat = i;
-    }
-  
-  return(cur_node);
+  for (i = 1; i <= no_of_categories; i++)
+  {
+    cur_node->no_of_points += cur_node->left_count[i] +
+                              cur_node->right_count[i];
+    if (cur_node->left_count[i] > cur_node->left_count[cur_node->left_cat])
+      cur_node->left_cat = i;
+    if (cur_node->right_count[i] > cur_node->right_count[cur_node->right_cat])
+      cur_node->right_cat = i;
+  }
+
+  return (cur_node);
 }
 
 /************************************************************************/
@@ -234,14 +238,15 @@ struct tree_node *read_hp(dtree)
 /*		0 : otherwise						*/
 /* Is called by modules :	read_subtree				*/
 /************************************************************************/
-int isleftchild(x,y)
-     struct tree_node *x,*y;
+int isleftchild(x, y) struct tree_node *x, *y;
 {
   char temp[MAX_DT_DEPTH];
-  
-  strcpy(temp,y->label);
-  if (!strcmp(strcat(temp,"l"),x->label)) return(1);
-  else return(0);
+
+  strcpy(temp, y->label);
+  if (!strcmp(strcat(temp, "l"), x->label))
+    return (1);
+  else
+    return (0);
 }
 
 /************************************************************************/
@@ -254,14 +259,15 @@ int isleftchild(x,y)
 /*		0 : otherwise						*/
 /* Is called by modules :	read_subtree				*/
 /************************************************************************/
-int isrightchild(x,y)
-     struct tree_node *x,*y;
+int isrightchild(x, y) struct tree_node *x, *y;
 {
   char temp[MAX_DT_DEPTH];
-  
-  strcpy(temp,y->label);
-  if (!strcmp(strcat(temp,"r"),x->label)) return(1);
-  else return(0);
+
+  strcpy(temp, y->label);
+  if (!strcmp(strcat(temp, "r"), x->label))
+    return (1);
+  else
+    return (0);
 }
 
 /************************************************************************/
@@ -278,12 +284,14 @@ int isrightchild(x,y)
 /*		your decision tree files are not produced by "mktree".	*/
 /************************************************************************/
 int read_header(dtree)
-     FILE *dtree;
+    FILE *dtree;
 {
-  if ((fscanf(dtree,"Training set: %[^,], ",train_data)) != 1) return(0);
-  if ((fscanf(dtree,"Dimensions: %d, Categories: %d\n",
-	      &no_of_dimensions,&no_of_categories)) != 2) return(0);
-  return(1);
+  if ((fscanf(dtree, "Training set: %[^,], ", train_data)) != 1)
+    return (0);
+  if ((fscanf(dtree, "Dimensions: %d, Categories: %d\n",
+              &no_of_dimensions, &no_of_categories)) != 2)
+    return (0);
+  return (1);
 }
 
 /************************************************************************/
@@ -296,15 +304,36 @@ int read_header(dtree)
 /* Is called by modules :       estimate_accuracy (classify.c)		*/
 /*				main (display.c)			*/
 /************************************************************************/
-int leaf_count(cur_node)
-     struct tree_node *cur_node;
+int leaf_count(cur_node) struct tree_node *cur_node;
 {
   int leaf_count();
-  
-  if (cur_node == NULL) return(1);
-  else return( leaf_count(cur_node->left)+leaf_count(cur_node->right));
+
+  if (cur_node == NULL)
+    return (1);
+  else
+    return (leaf_count(cur_node->left) + leaf_count(cur_node->right));
 }
- 
+
+/************************************************************************/
+/* Module name : node_count						*/
+/* Functionality :      Calculates the number of nodes of a subtree.   */
+/* Parameters : cur_node :      pointer to the root of the subtree whose*/
+/*                              leaves are to be counted.               */
+/* Returns :    number of nodes of the subtree pointed to by "cur_node"*/
+/* Calls modules :      node_count                                 	*/
+/* Is called by modules :       estimate_accuracy (classify.c)		*/
+/*				main (display.c)			*/
+/************************************************************************/
+int node_count(cur_node) struct tree_node *cur_node;
+{
+  int node_count();
+
+  if (cur_node == NULL)
+    return (1);
+  else
+    return (1 + node_count(cur_node->left) + node_count(cur_node->right));
+}
+
 /************************************************************************/
 /* Module name : tree_depth                                             */
 /* Functionality :      Calculate the maximum depth of any node in a    */
@@ -317,19 +346,20 @@ int leaf_count(cur_node)
 /* Is called by modules :       estimate_accuracy (classify.c)		*/
 /*				main (display.c)			*/
 /************************************************************************/
-int tree_depth(cur_node)
-     struct tree_node *cur_node;
+int tree_depth(cur_node) struct tree_node *cur_node;
 {
   int left_depth, right_depth, tree_depth();
-  
-  if (cur_node == NULL) return(0);
-  
+
+  if (cur_node == NULL)
+    return (0);
+
   left_depth = tree_depth(cur_node->left);
   right_depth = tree_depth(cur_node->right);
-  if (left_depth >= right_depth) return(left_depth+1);
-  return(right_depth+1);
+  if (left_depth >= right_depth)
+    return (left_depth + 1);
+  return (right_depth + 1);
 }
- 
+
 /************************************************************************/
 /* Module name : write_tree						*/
 /* Functionality :	High level routine to write a decision tree to 	*/
@@ -350,22 +380,21 @@ int tree_depth(cur_node)
 /*		even if there is the slightest deviation from the	*/
 /*		format outputted by the "write_*" routines.             */
 /************************************************************************/
-write_tree(root,dt_file)
-     struct tree_node *root;
-     char *dt_file;
+write_tree(root, dt_file) struct tree_node *root;
+char *dt_file;
 {
   FILE *dtree;
 
-  if ((dtree = fopen(dt_file,"w")) == NULL)
+  if ((dtree = fopen(dt_file, "w")) == NULL)
     error("Write_Tree: Decision Tree file can not be opened.");
 
   write_header(dtree);
-  write_subtree(root,dtree);
+  write_subtree(root, dtree);
   fclose(dtree);
 }
 
 /************************************************************************/
-/* Module name :	write_subtree					*/ 
+/* Module name :	write_subtree					*/
 /* Functionality : 	Initiates writing a hyperplane, and recursively	*/
 /*			writes the subtrees on the left and right of the*/
 /*			hyperplane.					*/
@@ -376,19 +405,19 @@ write_tree(root,dt_file)
 /* Is called by modules :	write_subtree				*/
 /*				write_tree				*/
 /************************************************************************/
-write_subtree(cur_node,dtree)
-     struct tree_node *cur_node;
-     FILE *dtree;
+write_subtree(cur_node, dtree) struct tree_node *cur_node;
+FILE *dtree;
 {
-  if (cur_node == NULL) return;
-  
-  write_hp(cur_node,dtree);
-  write_subtree(cur_node->left,dtree);
-  write_subtree(cur_node->right,dtree);
+  if (cur_node == NULL)
+    return;
+
+  write_hp(cur_node, dtree);
+  write_subtree(cur_node->left, dtree);
+  write_subtree(cur_node->right, dtree);
 }
 
 /************************************************************************/
-/* Module name :	write_hp					*/ 
+/* Module name :	write_hp					*/
 /* Functionality : Writes one hyperplane.				*/
 /* Parameters :	cur_node : Pointer to the DT node under consideration.	*/
 /*		dtree : File pointer to the output file.		*/
@@ -402,56 +431,61 @@ write_subtree(cur_node,dtree)
 /*				routines (in classify_util.c) about the	*/
 /*				structure of the DT.			*/
 /************************************************************************/
-write_hp(cur_node,dtree)
-     struct tree_node *cur_node;
-     FILE *dtree;
+write_hp(cur_node, dtree) struct tree_node *cur_node;
+FILE *dtree;
 {
   int i;
-  
-  if (dtree == NULL) return;
-  
-  if (strcmp(cur_node->label,"\0") == 0)
+
+  if (dtree == NULL)
+    return;
+
+  if (strcmp(cur_node->label, "\0") == 0)
     fprintf(dtree, "Root Hyperplane: ");
   else
-    fprintf(dtree, "%s Hyperplane: ",cur_node->label);
+    fprintf(dtree, "%s Hyperplane: ", cur_node->label);
 
-  fprintf(dtree,"Left = [");
-  for (i=1;i<=no_of_categories;i++)
-    if (i == no_of_categories) fprintf(dtree,"%d], ",cur_node->left_count[i]);
-    else fprintf(dtree,"%d,",cur_node->left_count[i]);
-  fprintf(dtree,"Right = [");
-  for (i=1;i<=no_of_categories;i++)
-    if (i == no_of_categories) fprintf(dtree,"%d]\n",cur_node->right_count[i]);
-    else fprintf(dtree,"%d,",cur_node->right_count[i]);
+  fprintf(dtree, "Left = [");
+  for (i = 1; i <= no_of_categories; i++)
+    if (i == no_of_categories)
+      fprintf(dtree, "%d], ", cur_node->left_count[i]);
+    else
+      fprintf(dtree, "%d,", cur_node->left_count[i]);
+  fprintf(dtree, "Right = [");
+  for (i = 1; i <= no_of_categories; i++)
+    if (i == no_of_categories)
+      fprintf(dtree, "%d]\n", cur_node->right_count[i]);
+    else
+      fprintf(dtree, "%d,", cur_node->right_count[i]);
 
-  for (i=1;i<=no_of_dimensions+1;i++)
+  for (i = 1; i <= no_of_dimensions + 1; i++)
     if (cur_node->coefficients[i])
-      {
-	if (i <= no_of_dimensions)
-	  fprintf(dtree,"%f x[%d] + ",cur_node->coefficients[i],i);
-	else
-	  fprintf(dtree,"%f = 0\n\n",cur_node->coefficients[i]);
-      }
+    {
+      if (i <= no_of_dimensions)
+        fprintf(dtree, "%f x[%d] + ", cur_node->coefficients[i], i);
+      else
+        fprintf(dtree, "%f = 0\n\n", cur_node->coefficients[i]);
+    }
 }
 
 /************************************************************************/
-/* Module name :	write_header					*/ 
+/* Module name :	write_header					*/
 /* Functionality :	Writes the decision tree header.		*/
 /* Parameters :	dtree : file pointer to the output file.		*/
 /* Is called by modules :	write_tree				*/
 /************************************************************************/
 write_header(dtree)
-     FILE *dtree;
+    FILE *dtree;
 {
-  extern int no_of_dimensions,no_of_categories;
+  extern int no_of_dimensions, no_of_categories;
   extern char train_data[LINESIZE];
-  
-  if (dtree == NULL) return;
-  
-  fprintf(dtree,"Training set: %s, ",train_data);
-  fprintf(dtree,"Dimensions: %d, Categories: %d\n",
-	  no_of_dimensions,no_of_categories);
-  fprintf(dtree,"\n\n");
+
+  if (dtree == NULL)
+    return;
+
+  fprintf(dtree, "Training set: %s, ", train_data);
+  fprintf(dtree, "Dimensions: %d, Categories: %d\n",
+          no_of_dimensions, no_of_categories);
+  fprintf(dtree, "\n\n");
 }
 
 /************************************************************************/

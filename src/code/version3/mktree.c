@@ -101,7 +101,7 @@ char *argv[];
 {
   extern char *optarg;
   extern int optind;
-  int c1, leaf_count(), tree_depth();
+  int c1, leaf_count(), node_count(), tree_depth();
   int i, j, no_of_correctly_classified_test_points;
   struct tree_node *root = NULL, *build_tree(), *read_tree();
   struct test_outcome result;
@@ -1328,9 +1328,10 @@ POINT **points;
     results[no_of_folds] = estimate_accuracy(test_points, no_of_test_points, root);
     end = clock();
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("fold %d: acc. = %.2f\t#leaves = %.0f\tmax. depth = %.0f\n",
+    printf("fold %d: acc. = %.2f\t#leaves=%.0f\t#nodes=%.0f\tmax. depth=%.0f\n",
            no_of_folds, results[no_of_folds].accuracy,
            results[no_of_folds].leaf_count,
+           results[no_of_folds].node_count,
            results[no_of_folds].tree_depth);
     sprintf(line, "***%d***%.7f***%.7f***\n",
             no_of_folds,
@@ -1347,7 +1348,7 @@ POINT **points;
   free((char *)(test_points + 1));
   free((char *)(train_points + 1));
 
-  resultsum.leaf_count = resultsum.tree_depth = resultsum.accuracy = 0;
+  resultsum.leaf_count = resultsum.node_count = resultsum.tree_depth = resultsum.accuracy = 0;
   resultsum.class = ivector(1, 2 * no_of_categories);
   for (i = 1; i <= 2 * no_of_categories; i++)
     resultsum.class[i] = 0;
@@ -1355,6 +1356,7 @@ POINT **points;
   for (i = 1; i <= no_of_folds; i++)
   {
     resultsum.leaf_count += results[i].leaf_count;
+    resultsum.node_count += results[i].node_count;
     resultsum.tree_depth += results[i].tree_depth;
     for (j = 1; j <= 2 * no_of_categories; j++)
       resultsum.class[j] += results[i].class[j];
@@ -1362,14 +1364,15 @@ POINT **points;
 
   resultsum.leaf_count /= no_of_folds;
   resultsum.tree_depth /= no_of_folds;
+  resultsum.node_count /= no_of_folds;
   for (i = 1; i <= no_of_categories; i++)
     no_of_corrects += resultsum.class[2 * i - 1];
   resultsum.accuracy = (100.0 * no_of_corrects) / no_of_points;
 
   if (verbose)
     printf("\nOverall:\t");
-  printf("accuracy = %.2f\t#leaves = %.2f\tmax depth = %.2f\n",
-         resultsum.accuracy, resultsum.leaf_count, resultsum.tree_depth);
+  printf("accuracy=%.2f\n#leaves=%.2f\n#nodes=%.2f\nmax depth=%.2f\n",
+         resultsum.accuracy, resultsum.leaf_count, resultsum.node_count, resultsum.tree_depth);
 
   if (verbose)
     for (i = 1; i <= no_of_categories; i++)
